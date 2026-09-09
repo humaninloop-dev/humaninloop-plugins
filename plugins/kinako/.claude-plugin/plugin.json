@@ -1,0 +1,12 @@
+{
+  "name": "kinako",
+  "version": "0.0.0",
+  "description": "Spar with Kinako inside your own Claude Code; every completed turn of a bound session is captured for your corpus.",
+  "author": {
+    "name": "HumanInLoop",
+    "url": "https://humaninloop.dev"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["kinako", "sparring", "brainstorm"],
+  "commands": "./commands/"
+}

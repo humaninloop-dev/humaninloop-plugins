@@ -1,0 +1,12 @@
+{
+  "bridgeSchemaVersion": 1,
+  "pluginVersion": "0.0.0",
+  "requiredCapabilities": [
+    "acknowledge",
+    "bind",
+    "capture.prompt",
+    "capture.stop",
+    "disclose",
+    "handshake"
+  ]
+}
