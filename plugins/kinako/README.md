@@ -22,8 +22,18 @@ Two absolute paths, set as environment variables where the hook can see them:
 
 | Variable | What it points at |
 |---|---|
-| `KINAKO_CLI` | the `kinako` binary — inside the app bundle at release (`IP-009`); the workspace build during dogfood |
-| `KINAKO_APP_DATA` | the app-data root, whose `spool/` directory the CLI writes and the core sweeps |
+| `KINAKO_CLI` | the `kinako` binary. On a `brew` install: `/Applications/Kinako.app/Contents/MacOS/kinako` — it ships **inside** the app bundle (`IP-009`), so there is no second thing to install. During dogfood: the workspace build at `target/release/kinako` |
+| `KINAKO_APP_DATA` | the app-data root, whose `spool/` directory the CLI writes and the core sweeps. On macOS: `/Users/<you>/Library/Application Support/dev.humaninloop.kinako` |
+
+**Both values must be literal absolute paths.** The hooks pass them to the CLI as
+`"$KINAKO_CLI" "$KINAKO_APP_DATA"`, which is a variable expansion and not a shell word expansion:
+a `~` written into the value arrives at the CLI as the character `~` and the call fails. Write
+`/Users/<you>/…`, not `~/…`.
+
+**Nothing sets these for you.** The app does not write your harness store (`FR-008`), so until both
+are set every hook exits 0 on its first line and **capture does not start** — no error, no captured
+turn. That is deliberate: an unbound or unconfigured session must stay inert (`FR-003`). The
+consented install path that would provision them is `IP-006`, and it is not built in this release.
 
 ## Installing it — two forms
 
@@ -61,7 +71,7 @@ In the test project's `.claude/settings.json`:
     ]
   },
   "env": {
-    "KINAKO_CLI": "/absolute/path/to/kinako/target/debug/kinako",
+    "KINAKO_CLI": "/absolute/path/to/kinako/target/release/kinako",
     "KINAKO_APP_DATA": "/absolute/path/to/an/app-data-root"
   }
 }
@@ -99,7 +109,32 @@ not committed. The bundled `hooks/hooks.json` registers all three events using
 `${CLAUDE_PLUGIN_ROOT}`, so no absolute path to any script is needed in this form.
 
 The two variables are still yours to set — under `env` in `~/.claude/settings.json`, or exported
-in the shell that launches `claude`. The marketplace carries the hooks, not the paths.
+in the shell that launches `claude`. The marketplace carries the hooks, not the paths. After a
+`brew install --cask humaninloop-dev/homebrew-tap/kinako`, both are fixed and this is the whole of
+it — substitute your own home directory:
+
+```json
+{
+  "env": {
+    "KINAKO_CLI": "/Applications/Kinako.app/Contents/MacOS/kinako",
+    "KINAKO_APP_DATA": "/Users/<you>/Library/Application Support/dev.humaninloop.kinako"
+  }
+}
+```
+
+Check it with the handshake before binding anything — it reads your harness, writes nothing, and
+names which of the three refusing conditions applies (the table further down lists them):
+
+```
+"$KINAKO_CLI" "$KINAKO_APP_DATA" handshake "$(claude --version)" < \
+  ~/.claude/plugins/cache/humaninloop-plugins/kinako/*/kinako-bridge.json
+```
+
+**The `KINAKO_CLI` path is inside an application bundle, which is `IP-009`'s recorded cost:** move
+or rename `Kinako.app` and the hook's path breaks. Capture health names that condition (`FR-018`)
+rather than failing silently. The argument for paying it is version skew — a separately installed
+CLI is a second independently-versioned artifact that can drift from the app it serves, and one
+fewer of those is one fewer source of the condition the handshake exists to catch.
 
 **The install is a copy, not a link.** Claude Code copies the plugin into
 `~/.claude/plugins/cache/humaninloop-plugins/kinako/<version>/` and records the commit it copied.
@@ -169,7 +204,7 @@ runs a handshake before it binds anything, and refuses by name when the pair doe
 ```json
 {
   "bridgeSchemaVersion": 1,
-  "pluginVersion": "0.0.0",
+  "pluginVersion": "0.4.0",
   "requiredCapabilities": ["acknowledge", "bind", "capture.prompt", "capture.stop",
                            "disclose", "handshake"]
 }
