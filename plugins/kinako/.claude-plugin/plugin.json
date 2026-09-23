@@ -1,6 +1,6 @@
 {
   "name": "kinako",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Spar with Kinako inside your own Claude Code; every completed turn of a bound session is captured for your corpus.",
   "author": {
     "name": "HumanInLoop",

@@ -110,7 +110,8 @@ not committed. The bundled `hooks/hooks.json` registers all three events using
 
 The two variables are still yours to set — under `env` in `~/.claude/settings.json`, or exported
 in the shell that launches `claude`. The marketplace carries the hooks, not the paths. After a
-`brew install --cask humaninloop-dev/homebrew-tap/kinako`, both are fixed and this is the whole of
+`brew install --cask humaninloop-dev/homebrew-tap/kinako` — which on Homebrew 6 needs a `brew
+trust` step first, given in the tap's own README — both are fixed and this is the whole of
 it — substitute your own home directory:
 
 ```json
