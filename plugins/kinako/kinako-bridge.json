@@ -1,6 +1,6 @@
 {
   "bridgeSchemaVersion": 1,
-  "pluginVersion": "0.5.1",
+  "pluginVersion": "0.5.2",
   "requiredCapabilities": [
     "acknowledge",
     "bind",
